@@ -1,0 +1,86 @@
+## Macro title: incoming-links
+## @param kader:title=Met kader|type=boolean|option-showNameInPlaceholder=true|option-showValueInPlaceholder=true|default=true
+## @param titel:title=Titel kader|type=string|option-showNameInPlaceholder=false|option-showValueInPlaceholder=false|default=Linken naar deze pagina:
+## @param kort:title=Verkorte titel|type=boolean|option-showNameInPlaceholder=false|option-showValueInPlaceholder=false|default=false|desc=Maakt titels max. 100 lang
+## @param space:title=Met space-link|type=boolean|option-showNameInPlaceholder=true|option-showValueInPlaceholder=true|default=true
+## @param sorted:title=Gesorteerd|type=boolean|option-showNameInPlaceholder=true|option-showValueInPlaceholder=true|default=true
+
+ #if ($paramkader == "true")
+    <ac:structured-macro  ac:name="panel" ac:schema-version="1">
+    <ac:parameter ac:name="title">$paramtitel</ac:parameter>
+    <ac:rich-text-body>
+#end
+
+#set($incLinks = $action.getIncomingLinks())
+
+#if($incLinks && $incLinks.size() > 0)
+
+    #set( $linkList = [] )
+
+     #foreach( $i in $incLinks )
+        #if(!($i.getSourceContent().isDeleted()))
+
+
+           #set( $pagetitle = "$i.getSourceContent().getDisplayTitle()" )
+            #set( $pagelink = "$req.contextPath$i.getSourceContent().getUrlPath()" )
+            #set( $spacename = "$i.getSourceContent().getSpace().getName()" )
+               #set( $spacelink = "$req.contextPath$i.getSourceContent().getSpace().getUrlPath()" )
+            
+            #set( $map = {"pagetitle": $pagetitle, "pagelink": $pagelink, "spacename": $spacename, "spacelink": $spacelink} )
+            #set( $discard = $linkList.add($map) )
+        #end
+    #end
+
+    #if ($paramsorted == "true")
+
+        #################
+        ## Bubble sort 
+        ## Gebaseerd op https://github.com/unidwell/confluence-include-child-pages-macro/blob/master/include_pages_macro.vm
+        #################
+
+        #set( $array =  $linkList )
+        #set( $size = $array.size() )
+        #foreach( $junk in $array )
+            #set( $count = -1 )
+            #foreach( $line in $array )
+                #set( $count = $count + 1 )
+                #if( $velocityCount < $size )
+                    #if( $line.pagetitle.compareToIgnoreCase($array.get($velocityCount).pagetitle) > 0 )
+                        #set( $tmp = $array.get($velocityCount) )
+                        #set( $junk = $array.set($velocityCount, $line) )
+                        #set( $junk = $array.set($count, $tmp) )
+                    #end
+                #end
+            #end
+        #end
+
+        #set( $linkList = $array)
+    #end
+
+    #foreach ($incLink in $linkList)
+
+          <p>
+        
+        <a href="$htmlUtil.htmlEncode("$incLink.pagelink")"
+        
+              #if ($paramkort == "true")
+            title="$incLink.pagetitle.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "'").replace("&#39;", "'").replace("&nbsp;", " ").replace("&apos;", "'")"
+
+            #set($linkTitle = $generalUtil.shortenString($incLink.pagetitle, 100))
+        #else
+            #set($linkTitle = $incLink.pagetitle)
+        #end
+
+>$linkTitle.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "'").replace("&#39;", "'").replace("&nbsp;", " ").replace("&apos;", "'")</a>
+        
+        #if ($paramspace == "true")
+            <span style="color: gray;">(<a style="text-decoration: none; color: inherit;" href="$htmlUtil.htmlEncode("$incLink.spacelink")">$incLink.spacename</a>)</span>
+        #end
+        </p>
+    #end
+#end
+
+ #if ($paramkader == "true")
+    </ac:rich-text-body>
+    </ac:structured-macro>
+#end
