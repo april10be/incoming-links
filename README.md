@@ -1,7 +1,9 @@
 # incoming-links
 Confluence user macro that displays a list of pages that link to the current page.
 
-Only tested on Confluence Server 7.13.x
+Tested on Confluence Server 7.13.x
+
+More on user macros: https://confluence.atlassian.com/conf713/writing-user-macros-1077914347.html
 
 ----
 
