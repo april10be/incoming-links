@@ -15,7 +15,7 @@ Possible enhancements:
 
 
 
-Tested on Confluence Server 7.13.x
+Tested on Confluence Server 7.19.x
 
 More on user macros: https://confluence.atlassian.com/conf713/writing-user-macros-1077914347.html
 
